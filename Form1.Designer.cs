@@ -40,10 +40,6 @@
             this.progressBar1.Size = new System.Drawing.Size(173, 23);
             this.progressBar1.TabIndex = 1;
             // 
-            // backgroundWorker1
-            // 
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            // 
             // Update
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -63,6 +59,7 @@
             this.Text = "Утилита обновления";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.Update_Load);
+            this.Shown += new System.EventHandler(this.Update_Shown);
             this.ResumeLayout(false);
 
         }
