@@ -37,8 +37,10 @@ namespace WindowsFormsApplication1
         uint nSize,
         string lpFileName);
 
-        [DllImport("kernel32")]
-        private static extern long WritePrivateProfileInt(String Section, String Key, int Value, String FilePath);
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool WritePrivateProfileString(string lpAppName,
+           string lpKeyName, string lpString, string lpFileName);
 
         private void Update_Shown(object sender, EventArgs e)
         {
@@ -80,14 +82,14 @@ namespace WindowsFormsApplication1
                 {
                     downloader(reader.GetString(0), "%TEMP%");
 
-                    log_write(reader.GetString(0), "Source", "update");
+                    log_write(reader.GetString(0), "Source", "pc");
                 }
                 else
                 {
-                    log_write("ВНИМАНИЕ! Путь к обновлению не задан на сервере", "Source", "update");
+                    log_write("ВНИМАНИЕ! Путь к обновлению не задан на сервере", "Source", "pc");
                     MessageBox.Show("ВНИМАНИЕ! Путь к обновлению не задан на сервере");
 
-                    WritePrivateProfileInt("SETTINGS", "status", 0, Environment.CurrentDirectory + "\\config.ini");
+                    WritePrivateProfileString("SETTINGS", "status", "0", Environment.CurrentDirectory + "\\config.ini");
                     Application.Exit();
                 }
             }
@@ -96,7 +98,7 @@ namespace WindowsFormsApplication1
                 log_write(exc.Message, "Exception", "Exception");
                 MessageBox.Show(exc.Message);
 
-                WritePrivateProfileInt("SETTINGS", "status", 0, Environment.CurrentDirectory + "\\config.ini");
+                WritePrivateProfileString("SETTINGS", "status", "0", Environment.CurrentDirectory + "\\config.ini");
             }
             finally
             {
@@ -127,9 +129,9 @@ namespace WindowsFormsApplication1
             }
             catch (System.Exception exc)
             {
-                log_write(exc.Message, "EXCEPTION", "update");
+                log_write(exc.Message, "EXCEPTION", "pc");
 
-                WritePrivateProfileInt("SETTINGS", "status", 0, Environment.CurrentDirectory + "\\config.ini");
+                WritePrivateProfileString("SETTINGS", "status", "0", Environment.CurrentDirectory + "\\config.ini");
             }
             finally
             {
@@ -147,11 +149,11 @@ namespace WindowsFormsApplication1
 
                 while (File.Exists(name))
                 {
-                    log_write("Делаем копию файла", "INFO", "update");
+                    log_write("Делаем копию файла", "INFO", "pc");
                     File.Move(name, "backup_" + name);
                     Thread.Sleep(300);
 
-                    log_write("Удаляем оригинальный файл", "INFO", "update");
+                    log_write("Удаляем оригинальный файл", "INFO", "pc");
                     File.Delete(name);
                     Thread.Sleep(300);
                 }
@@ -166,25 +168,25 @@ namespace WindowsFormsApplication1
 
                 if (File.Exists(name))
                 {
-                    log_write("Запускаем обновленное приложение", "INFO", "update");
+                    log_write("Запускаем обновленное приложение", "INFO", "pc");
 
                     System.Diagnostics.Process.Start(name);
 
-                    WritePrivateProfileInt("SETTINGS", "status", 1, Environment.CurrentDirectory + "\\config.ini");
+                    WritePrivateProfileString("SETTINGS", "status", "1", Environment.CurrentDirectory + "\\config.ini");
 
                     if (File.Exists("_" + name))
                     {
                         File.Delete("_" + name);
-                        log_write("Удаляем временный файл", "INFO", "update");
+                        log_write("Удаляем временный файл", "INFO", "pc");
                     }
 
-                    log_write("Выходим из утилиты обновления", "INFO", "update");
+                    log_write("Выходим из утилиты обновления", "INFO", "pc");
 
                     Application.Exit();
                 }
                 else
                 {
-                    log_write("Ошибка при обновлении приложения!", "EXCEPTION", "update");
+                    log_write("Ошибка при обновлении приложения!", "EXCEPTION", "pc");
                     MessageBox.Show("Внимание!При обновлении произошла ошибка,обратитесь к системному администратору!");
 
                     //check this
@@ -193,17 +195,17 @@ namespace WindowsFormsApplication1
             }
             catch (System.Exception exс)
             {
-                log_write(exс.Message, "EXCEPTION", "update");
+                log_write(exс.Message, "EXCEPTION", "pc");
                 status = false;
 
-                WritePrivateProfileInt("SETTINGS", "status", 0, Environment.CurrentDirectory + "\\config.ini");
+                WritePrivateProfileString("SETTINGS", "status", "0", Environment.CurrentDirectory + "\\config.ini");
             }
             finally
             {
                 if(status)
                 {
                     Thread.Sleep(600);
-                    log_write("Успешно!", "INFO", "update");
+                    log_write("Успешно!", "INFO", "pc");
                     progressBar1.Value = 100;
                     Thread.Sleep(3000);
                     Application.Exit();
@@ -216,25 +218,25 @@ namespace WindowsFormsApplication1
         {
             try
             {
-                WritePrivateProfileInt("SETTINGS", "status", 0, Environment.CurrentDirectory + "\\config.ini");
+                WritePrivateProfileString("SETTINGS", "status", "1", Environment.CurrentDirectory + "\\config.ini");
 
-                log_write("Возвращаем все обратно", "INFO", "update");
+                log_write("Возвращаем все обратно", "INFO", "pc");
                 File.Move("backup_" + name, name);
                 Thread.Sleep(300);
 
-                log_write("Удаляем запасной файл", "INFO", "update");
+                log_write("Удаляем запасной файл", "INFO", "pc");
                 File.Delete("backup" + name);
                 Thread.Sleep(300);
 
                 if (File.Exists(name))
                 {
                     System.Diagnostics.Process.Start(name);
-                    WritePrivateProfileInt("SETTINGS", "status", 1, Environment.CurrentDirectory + "\\config.ini");
+                    WritePrivateProfileString("SETTINGS", "status", "1", Environment.CurrentDirectory + "\\config.ini");
                 }
             }
             catch (System.Exception exc)
             {
-                log_write(exc.Message, "EXCEPTION", "update");
+                log_write(exc.Message, "EXCEPTION", "pc");
             }
             finally
             {
@@ -248,9 +250,9 @@ namespace WindowsFormsApplication1
             string EntryDate = DateTime.Today.ToShortDateString();
             string fileName = "log/" + EntryDate + "/" + logname + ".log";  //log + data +logname ? 
 
-            if (!Directory.Exists(Environment.CurrentDirectory + "/log/" + EntryDate + "/"))
+            if (!Directory.Exists(Environment.CurrentDirectory + "/log/"))
             {
-                Directory.CreateDirectory((Environment.CurrentDirectory + "/log/" + EntryDate + "/"));
+                Directory.CreateDirectory((Environment.CurrentDirectory + "/log/"));
             }
 
             try
@@ -268,14 +270,14 @@ namespace WindowsFormsApplication1
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            log_write("Выход из прогаммы обновления ", "INFO", "Update");
+            log_write("Выход из прогаммы обновления ", "INFO", "pc");
             this.Hide();
             Application.Exit();
         }
 
         private void Update_Load(object sender, EventArgs e)
         {
-            log_write("Программа обновления запущена ", "INFO", "Update");
+            log_write("Программа обновления запущена ", "INFO", "pc");
         }
     }
 }
