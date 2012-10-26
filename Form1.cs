@@ -82,7 +82,7 @@ namespace WindowsFormsApplication1
                 {
                     downloader(reader.GetString(0), "%TEMP%");
 
-                    log_write(reader.GetString(0), "Source", "pc");
+                    //log_write(reader.GetString(0), "Source", "pc");
                 }
                 else
                 {
@@ -149,6 +149,12 @@ namespace WindowsFormsApplication1
 
                 while (File.Exists(name))
                 {
+                    if (File.Exists("backup_" + name))
+                    {
+                        File.Delete("backup_" + name);
+                        Thread.Sleep(100);
+                    }
+
                     log_write("Делаем копию файла", "INFO", "pc");
                     File.Move(name, "backup_" + name);
                     Thread.Sleep(300);
@@ -170,6 +176,7 @@ namespace WindowsFormsApplication1
                 {
                     log_write("Запускаем обновленное приложение", "INFO", "pc");
 
+                    Thread.Sleep(300);
                     System.Diagnostics.Process.Start(name);
 
                     WritePrivateProfileString("SETTINGS", "status", "1", Environment.CurrentDirectory + "\\config.ini");
@@ -230,6 +237,7 @@ namespace WindowsFormsApplication1
 
                 if (File.Exists(name))
                 {
+                    Thread.Sleep(300);
                     System.Diagnostics.Process.Start(name);
                     WritePrivateProfileString("SETTINGS", "status", "1", Environment.CurrentDirectory + "\\config.ini");
                 }
@@ -248,7 +256,7 @@ namespace WindowsFormsApplication1
         {
             string EntryTime = DateTime.Now.ToLongTimeString();
             string EntryDate = DateTime.Today.ToShortDateString();
-            string fileName = "log/" + EntryDate + "/" + logname + ".log";  //log + data +logname ? 
+            string fileName = "log/" + logname + ".log";  //log + data +logname ? 
 
             if (!Directory.Exists(Environment.CurrentDirectory + "/log/"))
             {
