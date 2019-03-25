@@ -55,7 +55,7 @@ namespace WindowsFormsApplication1
             StringBuilder buffer = new StringBuilder(50, 50);
 
             GetPrivateProfileString("SETTINGS", "srv_local", "192.168.1.11", buffer, 50, Environment.CurrentDirectory + "\\config.ini");
-            connStr = string.Format("server={0};uid={1};pwd={2};database={3};", buffer, "pricechecker", "***REMOVED***", "action");
+            connStr = string.Format("server={0};uid={1};pwd={2};database={3};", buffer, "pricechecker", "", "action");
             serverConn = new MySqlConnection(connStr);
 
             GetPrivateProfileString("SETTINGS", "program", "null", buffer, 50, Environment.CurrentDirectory + "\\config.ini");
